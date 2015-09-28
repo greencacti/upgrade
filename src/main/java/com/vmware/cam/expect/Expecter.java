@@ -4,7 +4,6 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.vmware.cam.util.SimpleSleep;
 import net.sf.expectit.Expect;
 import net.sf.expectit.ExpectBuilder;
 
@@ -19,16 +18,16 @@ import static net.sf.expectit.matcher.Matchers.anyString;
  * Created by baominw on 9/26/15.
  */
 public class Expecter {
-    private final String hbrServer;
+    private final String server;
     private final String username;
     private final String password;
 
     private Session session = null;
-    Channel channel = null;
-    Expect expect = null;
+    private Channel channel = null;
+    private Expect expect = null;
 
-    public Expecter(String hbrServer, String username, String password) {
-        this.hbrServer = hbrServer;
+    public Expecter(String server, String username, String password) {
+        this.server = server;
         this.username = username;
         this.password = password;
     }
@@ -36,7 +35,7 @@ public class Expecter {
     public void start(boolean isDebugEnabled) {
         try {
             JSch jSch = new JSch();
-            session = jSch.getSession(username, hbrServer);
+            session = jSch.getSession(username, server);
             session.setPassword(password);
             Properties config = new Properties();
             config.put("StrictHostKeyChecking", "no");
@@ -45,7 +44,7 @@ public class Expecter {
             channel = session.openChannel("shell");
             channel.connect();
 
-            System.out.println("Login to " + hbrServer + " successfully");
+            System.out.println("Login to " + server + " successfully");
 
             ExpectBuilder expectBuilder = new ExpectBuilder()
                     .withOutput(channel.getOutputStream())
@@ -59,22 +58,20 @@ public class Expecter {
                         .withEchoInput(System.err);
             }
 
-            expect = expectBuilder
-                    .build();
-            SimpleSleep.sleep(1);
+            expect = expectBuilder.build();
             expect.expect(anyString());
         } catch (JSchException jschException) {
             if (jschException.getCause() instanceof SocketException) {
-                System.out.println(hbrServer + " is unreachable");
+                System.out.println(server + " is unreachable");
             } else if (jschException.getMessage().equals("Auth fail")) {
                 System.out.println("incorrect username or password");
             }
 
             jschException.printStackTrace();
-            throw new RuntimeException();
-        } catch (Exception e) {
+            throw new RuntimeException(jschException);
+        } catch (Throwable e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 

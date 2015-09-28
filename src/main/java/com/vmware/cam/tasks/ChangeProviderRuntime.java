@@ -8,9 +8,9 @@ import static net.sf.expectit.matcher.Matchers.anyString;
  * Created by baominw on 9/26/15.
  */
 public class ChangeProviderRuntime {
-    public static void execute(Expect expect, String hbrServer, String localRepositoryAddress) {
+    public static void execute(Expect expect, String server, String localRepositoryAddress) {
         try {
-            expect.sendLine("\necho '" +
+            expect.sendLine("echo '" +
                     "<service>\n" +
                     "  <properties>\n" +
                     "    <property name=\"localRepositoryAddress\" value=\"" + localRepositoryAddress + "\" />\n" +
@@ -19,7 +19,7 @@ public class ChangeProviderRuntime {
                     "</service>'" +
                     "> /opt/vmware/var/lib/vami/update/provider/provider-runtime.xml");
             expect.expect(anyString());
-            System.out.println("\nupdate provider-runtime.xml successfully for " + hbrServer);
+            System.out.println("update provider-runtime.xml successfully for " + server);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

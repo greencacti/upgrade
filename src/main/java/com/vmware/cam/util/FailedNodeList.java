@@ -7,21 +7,21 @@ import java.io.FileWriter;
 /**
  * Created by baominw on 9/27/15.
  */
-public class FailedUpgradeList {
+public class FailedNodeList {
     private static final Object lock = new Object();
-    private static volatile FailedUpgradeList instance = null;
+    private static volatile FailedNodeList instance = null;
     private String fileName = "";
     private BufferedWriter writer = null;
 
-    private FailedUpgradeList(String fileName) {
+    private FailedNodeList(String fileName) {
         this.fileName = fileName;
     }
 
-    public static FailedUpgradeList getInstance(String fileName) {
+    public static FailedNodeList getInstance(String fileName) {
         if (instance == null) {
             synchronized (lock) {
                 if (instance == null) {
-                    instance = new FailedUpgradeList(fileName);
+                    instance = new FailedNodeList(fileName);
                 }
             }
         }
@@ -35,7 +35,7 @@ public class FailedUpgradeList {
                 if (writer == null) {
                     try {
                         File file = new File(fileName);
-                        if(!file.exists()){
+                        if (!file.exists()) {
                             file.createNewFile();
                         }
                         writer = new BufferedWriter(new FileWriter(file));
@@ -55,7 +55,8 @@ public class FailedUpgradeList {
                 writer.newLine();
                 writer.flush();
             } catch (Exception e) {
-
+                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
@@ -67,7 +68,6 @@ public class FailedUpgradeList {
                     try {
                         writer.close();
                     } catch (Exception e) {
-
                     }
 
                 }

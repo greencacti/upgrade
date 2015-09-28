@@ -1,7 +1,9 @@
 package com.vmware.cam;
 
-import com.vmware.cam.util.FailedUpgradeList;
+import com.vmware.cam.service.CamUiUpgrade;
 import com.vmware.cam.service.HbrUpgrade;
+import com.vmware.cam.service.HmsUpgrade;
+import com.vmware.cam.util.FailedNodeList;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -16,7 +18,9 @@ import java.util.concurrent.Executors;
  */
 public class Main {
     private static enum Component {
-        HBR
+        HBR,
+        HMS,
+        CAMUI
     }
 
     private static final String COMMENT_PREFIX = "#";
@@ -31,6 +35,10 @@ public class Main {
         Component component = null;
         if (args[0].equals("hbr")) {
             component = Component.HBR;
+        } else if (args[0].equals("hms")) {
+            component = Component.HMS;
+        } else if (args[0].equals("camui")) {
+            component = Component.CAMUI;
         } else {
             System.out.println("component name is not correct");
             usage();
@@ -39,6 +47,8 @@ public class Main {
 
         String configFileName = "";
         String hbrListFileName = "";
+        String hmsListFileName = "";
+        String vcdcellListFileName = "";
         String failedListFileName = "";
         String username = "";
         String password = "";
@@ -48,6 +58,10 @@ public class Main {
                 configFileName = arg.substring("--config=".length());
             } else if (arg.startsWith("--hbrlist=")) {
                 hbrListFileName = arg.substring("--hbrlist=".length());
+            } else if (arg.startsWith("--hmslist=")) {
+                hmsListFileName = arg.substring("--hmslist=".length());
+            } else if (arg.startsWith("--vcdcelllist=")) {
+                vcdcellListFileName = arg.substring("--vcdcelllist=".length());
             } else if (arg.startsWith("--user=")) {
                 username = arg.substring("--user=".length());
             } else if (arg.startsWith("--password=")) {
@@ -61,10 +75,6 @@ public class Main {
             usage();
             return;
         }
-        if (hbrListFileName.equals("")) {
-            usage();
-            return;
-        }
         if (username.equals("")) {
             usage();
             return;
@@ -73,7 +83,7 @@ public class Main {
             usage();
             return;
         }
-        if(failedListFileName.equals("")) {
+        if (failedListFileName.equals("")) {
             usage();
             return;
         }
@@ -87,18 +97,23 @@ public class Main {
             return;
         } catch (IOException e) {
             usage();
+            e.printStackTrace();
             return;
         }
 
-        FailedUpgradeList failedUpgradeList = FailedUpgradeList.getInstance(failedListFileName);
-        failedUpgradeList.init();
+        FailedNodeList failedNodeList = FailedNodeList.getInstance(failedListFileName);
+        failedNodeList.init();
 
         if (component == Component.HBR) {
+            if (hbrListFileName.equals("")) {
+                usage();
+                return;
+            }
+
             String[] hbrServerList = readListFile(hbrListFileName);
             int maxThroughput = hbrServerList.length;
             if (maxThroughput == 0) {
                 System.out.println("hbr.list is empty");
-                usage();
                 return;
             }
 
@@ -106,18 +121,62 @@ public class Main {
 
             ExecutorService executorService = Executors.newFixedThreadPool(maxThroughput);
             for (String hbrServer : hbrServerList) {
-                executorService.submit(new HbrUpgrade(hbrServer, username, password, properties, failedUpgradeList, latch));
+                executorService.submit(new HbrUpgrade(hbrServer, username, password, properties, failedNodeList, latch));
+            }
+
+            latch.await();
+            executorService.shutdown();
+        } else if (component == Component.HMS) {
+            if (hmsListFileName.equals("")) {
+                usage();
+                return;
+            }
+
+            String[] hmsServerList = readListFile(hmsListFileName);
+            int maxThroughput = hmsServerList.length;
+            if (maxThroughput == 0) {
+                System.out.println("hms.list is empty");
+                return;
+            }
+
+            CountDownLatch latch = new CountDownLatch(maxThroughput);
+
+            ExecutorService executorService = Executors.newFixedThreadPool(maxThroughput);
+            for (String hmsServer : hmsServerList) {
+                executorService.submit(new HmsUpgrade(hmsServer, username, password, properties, failedNodeList, latch));
+            }
+
+            latch.await();
+            executorService.shutdown();
+        } else {
+            if (vcdcellListFileName.equals("")) {
+                usage();
+                return;
+            }
+
+            String[] vcdcellList = readListFile(vcdcellListFileName);
+            int maxThroughput = vcdcellList.length;
+            if (maxThroughput == 0) {
+                System.out.println("vcdcell.list is empty");
+                return;
+            }
+
+            CountDownLatch latch = new CountDownLatch(maxThroughput);
+
+            ExecutorService executorService = Executors.newFixedThreadPool(maxThroughput);
+            for (String vcdcell : vcdcellList) {
+                executorService.submit(new CamUiUpgrade(vcdcell, username, password, properties, failedNodeList, latch));
             }
 
             latch.await();
             executorService.shutdown();
         }
 
-        failedUpgradeList.close();
+        failedNodeList.close();
     }
 
     private static void usage() {
-        System.out.println("Usage: upgrade hbr --config=configfile --hbrlist=hbr.list --failedList=failed.list --user=username --password=password");
+        System.out.println("Usage: upgrade [hbr|hms|camui] --config=configfile [--hbrlist=hbr.list|--hmslist=hms.list|--vcdcelllist=vcdcell.list] --failedList=failed.list --user=username --password=password");
     }
 
     private static String[] readListFile(String fileName) {

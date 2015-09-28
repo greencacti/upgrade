@@ -11,7 +11,7 @@ import static net.sf.expectit.matcher.Matchers.contains;
  * Created by baominw on 9/27/15.
  */
 public class VerifyUpdate {
-    public static void execute(Expect expect, String hbrServer, String hmsVersion) {
+    public static void execute(Expect expect, String server, String hmsVersion) {
         // wait until the installation is successful
         SimpleSleep.sleep(120);
         try {
@@ -29,16 +29,16 @@ public class VerifyUpdate {
             }
 
             if (counter > 0) {
-                System.out.println("\nInstallation is successful for " + hbrServer);
+                System.out.println("Installation is successful for " + server);
             } else {
-                System.out.println("\nInstallation is failed for " + hbrServer);
+                System.out.println("Installation is failed for " + server);
                 throw new RuntimeException();
             }
 
             // check the installed version
             expect.sendLine("rpm -qa|grep hms");
             expect.expect(contains(hmsVersion));
-            System.out.println(hmsVersion + " is installed");
+            System.out.println(hmsVersion + " is installed for " + server);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

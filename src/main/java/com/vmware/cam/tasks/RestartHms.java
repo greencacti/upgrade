@@ -8,15 +8,15 @@ import static net.sf.expectit.matcher.Matchers.contains;
 /**
  * Created by baominw on 9/27/15.
  */
-public class RestartHbr {
+public class RestartHms {
     public static void execute(Expect expect, String server) {
         try {
-            expect.sendLine("service hbrsrv restart");
+            expect.sendLine("service hms restart");
             SimpleSleep.sleep(10);
 
-            expect.sendLine("service hbrsrv status");
+            expect.sendLine("service hms status");
             expect.expect(contains("running"));
-            System.out.println("HBR Service is started in " + server);
+            System.out.println("HMS Service is started in " + server);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
