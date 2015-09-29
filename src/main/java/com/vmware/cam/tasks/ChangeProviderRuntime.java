@@ -20,7 +20,7 @@ public class ChangeProviderRuntime {
                     "> /opt/vmware/var/lib/vami/update/provider/provider-runtime.xml");
             expect.expect(anyString());
             System.out.println("update provider-runtime.xml successfully for " + server);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

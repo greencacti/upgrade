@@ -13,7 +13,7 @@ public class CheckUpdate {
             expect.sendLine("/opt/vmware/bin/vamicli update --check");
             expect.expect(contains(hmsBuildNumber));
             System.out.println("Check update successfully for " + server);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

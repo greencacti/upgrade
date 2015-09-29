@@ -35,9 +35,7 @@ public class FailedNodeList {
                 if (writer == null) {
                     try {
                         File file = new File(fileName);
-                        if (!file.exists()) {
-                            file.createNewFile();
-                        }
+                        file.createNewFile();
                         writer = new BufferedWriter(new FileWriter(file));
                     } catch (Exception e) {
                         e.printStackTrace();

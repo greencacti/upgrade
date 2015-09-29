@@ -10,7 +10,7 @@ public class InstallUpdate {
         try {
             expect.sendLine("/opt/vmware/bin/vamicli update --install latest");
             System.out.println("Installation is ongoing for " + server);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

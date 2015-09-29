@@ -17,7 +17,7 @@ public class RestartHms {
             expect.sendLine("service hms status");
             expect.expect(contains("running"));
             System.out.println("HMS Service is started in " + server);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

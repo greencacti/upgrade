@@ -17,7 +17,7 @@ public class RestartHbr {
             expect.sendLine("service hbrsrv status");
             expect.expect(contains("running"));
             System.out.println("HBR Service is started in " + server);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

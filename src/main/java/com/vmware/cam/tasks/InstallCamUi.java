@@ -20,7 +20,7 @@ public class InstallCamUi {
             expect.sendLine("service vmware-vcd restart");
             expect.expect(times(4, contains("OK")));
             System.out.println("Restart vCD cell successfully for " + server);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

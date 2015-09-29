@@ -39,7 +39,7 @@ public class VerifyUpdate {
             expect.sendLine("rpm -qa|grep hms");
             expect.expect(contains(hmsVersion));
             System.out.println(hmsVersion + " is installed for " + server);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
