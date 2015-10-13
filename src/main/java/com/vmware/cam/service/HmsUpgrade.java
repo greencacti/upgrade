@@ -67,7 +67,7 @@ public class HmsUpgrade implements Runnable {
             VerifyUpdate.execute(expect, hmsServer, hmsVersion);
 
             // restart HMS Service
-            RestartHms.execute(expect, hmsServer);
+            RestartService.execute(expect, hmsServer, "hms");
 
             expecter.stop();
             latch.countDown();

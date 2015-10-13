@@ -67,7 +67,7 @@ public class HbrUpgrade implements Runnable {
             VerifyUpdate.execute(expect, hbrServer, hmsVersion);
 
             // restart HBR Service
-            RestartHbr.execute(expect, hbrServer);
+            RestartService.execute(expect, hbrServer, "hbrsrv");
 
             expecter.stop();
             latch.countDown();

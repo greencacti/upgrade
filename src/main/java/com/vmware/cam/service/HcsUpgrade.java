@@ -3,6 +3,7 @@ package com.vmware.cam.service;
 import com.vmware.cam.expect.Expecter;
 import com.vmware.cam.tasks.*;
 import com.vmware.cam.util.FailedNodeList;
+import com.vmware.cam.util.SimpleSleep;
 import net.sf.expectit.Expect;
 
 import java.util.Properties;
@@ -68,6 +69,25 @@ public class HcsUpgrade implements Runnable {
 
             // change HCS Configuration
             ChangeHcsConfiguration.execute(expect, hcsServer);
+
+            // reboot HCS appliance
+            RebootAppliance.execute(expect, hcsServer);
+            expecter.stop();
+            SimpleSleep.sleep(30);
+
+            // reconnect to hcs server
+            ReconnectToServer.execute(expecter, hcsServer, isDebugEnabled);
+            expect = expecter.getExpect();
+
+            // change CAM configuration
+
+            // activitate CAM Service
+            ActivitateService.execute(expect, hcsServer, "cam");
+
+            // restart CAM Service
+            RestartService.execute(expect, hcsServer, "cam");
+
+            // check CAM Service
 
             expecter.stop();
             latch.countDown();

@@ -4,6 +4,7 @@ import com.vmware.cam.util.SimpleSleep;
 import net.sf.expectit.Expect;
 
 import static net.sf.expectit.matcher.Matchers.anyString;
+import static net.sf.expectit.matcher.Matchers.contains;
 
 /**
  * Created by baominw on 9/26/15.
@@ -40,17 +41,17 @@ public class ChangeHcsConfiguration {
                     "\n" +
                     "service.routing.key=hcs\n" +
                     "\n" +
-                    "vc-gateway-expiration-minutes=5'  >> /opt/vmware/hms/conf/hcs-config.properties.rpmsave");
+                    "vc-gateway-expiration-minutes=5'  >> /opt/vmware/hms/conf/hcs-config.properties.rpmsave && echo 'success'");
             SimpleSleep.sleep(1);
-            expect.expect(anyString());
+            expect.expect(contains("success"));
 
-            expect.sendLine("mv /opt/vmware/hms/conf/hcs-config.properties /opt/vmware/hms/conf/hcs-config.properties.new");
+            expect.sendLine("mv /opt/vmware/hms/conf/hcs-config.properties /opt/vmware/hms/conf/hcs-config.properties.new && echo 'success'");
             SimpleSleep.sleep(1);
-            expect.expect(anyString());
+            expect.expect(contains("success"));
 
-            expect.sendLine("mv /opt/vmware/hms/conf/hcs-config.properties.rpmsave /opt/vmware/hms/conf/hcs-config.properties");
+            expect.sendLine("mv /opt/vmware/hms/conf/hcs-config.properties.rpmsave /opt/vmware/hms/conf/hcs-config.properties && echo 'success'");
             SimpleSleep.sleep(1);
-            expect.expect(anyString());
+            expect.expect(contains("success"));
             System.out.println("append new configurations into hcs-config.properties in " + server);
         } catch (Throwable e) {
             e.printStackTrace();

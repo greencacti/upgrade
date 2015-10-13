@@ -4,6 +4,7 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.vmware.cam.util.SimpleSleep;
 import net.sf.expectit.Expect;
 import net.sf.expectit.ExpectBuilder;
 
@@ -67,7 +68,6 @@ public class Expecter {
                 System.out.println("incorrect username or password");
             }
 
-            jschException.printStackTrace();
             throw new RuntimeException(jschException);
         } catch (Throwable e) {
             e.printStackTrace();
