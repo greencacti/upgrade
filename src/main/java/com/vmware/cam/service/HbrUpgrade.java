@@ -3,6 +3,7 @@ package com.vmware.cam.service;
 import com.vmware.cam.expect.Expecter;
 import com.vmware.cam.tasks.*;
 import com.vmware.cam.util.FailedNodeList;
+import com.vmware.cam.util.SimpleSleep;
 import net.sf.expectit.Expect;
 
 import java.util.Properties;
@@ -65,6 +66,21 @@ public class HbrUpgrade implements Runnable {
                 throw new RuntimeException();
             }
             VerifyUpdate.execute(expect, hbrServer, hmsVersion);
+
+            // reboot hbr appliance
+            RebootAppliance.execute(expect, hbrServer);
+            expecter.stop();
+            SimpleSleep.sleep(30);
+
+            // reconnect to hbr server
+            ReconnectToServer.execute(expecter, hbrServer, isDebugEnabled);
+            expect = expecter.getExpect();
+
+            // enable 2144(TCP Port) in FW
+            EnableTcpPortInFW.execute(expect, hbrServer, "2144");
+
+            // reload firewall configuration
+            ReloadFW.execute(expect, hbrServer);
 
             // restart HBR Service
             RestartService.execute(expect, hbrServer, "hbrsrv");

@@ -3,6 +3,7 @@ package com.vmware.cam.service;
 import com.vmware.cam.expect.Expecter;
 import com.vmware.cam.tasks.*;
 import com.vmware.cam.util.FailedNodeList;
+import com.vmware.cam.util.SimpleSleep;
 import net.sf.expectit.Expect;
 
 import java.util.Properties;
@@ -65,6 +66,15 @@ public class HmsUpgrade implements Runnable {
                 throw new RuntimeException();
             }
             VerifyUpdate.execute(expect, hmsServer, hmsVersion);
+
+            // reboot hms appliance
+            RebootAppliance.execute(expect, hmsServer);
+            expecter.stop();
+            SimpleSleep.sleep(30);
+
+            // reconnect to hms server
+            ReconnectToServer.execute(expecter, hmsServer, isDebugEnabled);
+            expect = expecter.getExpect();
 
             // restart HMS Service
             RestartService.execute(expect, hmsServer, "hms");
