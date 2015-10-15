@@ -3,7 +3,9 @@ package com.vmware.cam.service;
 import com.vmware.cam.expect.Expecter;
 import com.vmware.cam.tasks.*;
 import com.vmware.cam.util.FailedNodeList;
+import com.vmware.cam.util.ScpRcTo;
 import com.vmware.cam.util.SimpleSleep;
+
 import net.sf.expectit.Expect;
 
 import java.util.Properties;
@@ -18,13 +20,17 @@ public class HcsUpgrade implements Runnable {
     private final String hcsServer;
     private final Properties properties;
     private final FailedNodeList failedNodeList;
+    private final ScpRcTo scp;
+    private final String configFileName;
 
-    public HcsUpgrade(String hcsServer, String username, String password, Properties properties, FailedNodeList failedNodeList, CountDownLatch latch) {
+    public HcsUpgrade(String hcsServer, String username, String password, Properties properties, FailedNodeList failedNodeList, CountDownLatch latch, String configFileName) {
         this.expecter = new Expecter(hcsServer, username, password);
+        this.scp = new ScpRcTo(hcsServer, username, password);
         this.hcsServer = hcsServer;
         this.properties = properties;
         this.latch = latch;
         this.failedNodeList = failedNodeList;
+        this.configFileName = configFileName;
     }
 
     @Override
@@ -69,7 +75,7 @@ public class HcsUpgrade implements Runnable {
 
             // change HCS Configuration
             ChangeHcsConfiguration.execute(expect, hcsServer);
-
+            
             // reboot HCS appliance
             RebootAppliance.execute(expect, hcsServer);
             expecter.stop();
@@ -80,6 +86,9 @@ public class HcsUpgrade implements Runnable {
             expect = expecter.getExpect();
 
             // change CAM configuration
+            scp.start();
+            ChangeCamConfiguration.execute(expect, scp, hcsServer, configFileName);
+            scp.stop();
 
             // Remove cam.log
             RemoveFileOrDir.execute(expect, hcsServer, "/opt/vmware/hms/logs/cam.log");

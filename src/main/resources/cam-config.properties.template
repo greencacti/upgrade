@@ -1,0 +1,104 @@
+#
+# Copyright 2015 VMware, Inc.  All rights reserved. VMware Confidential
+#
+
+ls.url={file:hcs-config.properties#ls.url}
+ls.thumbprint={file:hcs-config.properties#ls.thumbprint}
+hcs.uuid={file:hcs-config.properties#hcs.uuid}
+
+# in seconds
+
+amqp.host={file:hcs-config.properties#amqp.host}
+amqp.port={file:hcs-config.properties#amqp.port}
+amqp.user={file:hcs-config.properties#amqp.user}
+amqp.pass={file:hcs-config.properties#amqp.pass}
+amqp.vHost={file:hcs-config.properties#amqp.vHost}
+amqp.extension.exchange={file:hcs-config.properties#amqp.extension.exchange}
+amqp.extension.exchange.type={file:hcs-config.properties#amqp.extension.exchange.type}
+amqp.extension.exchange.durable={file:hcs-config.properties#amqp.extension.exchange.durable}
+#if not specified the default value would be <amqp.extension.exchange>-cam.api.extension
+#amqp.extension.queue=
+amqp.extension.queue.durable={file:hcs-config.properties#amqp.extension.queue.durable}
+amqp.extension.queue.exclusive={file:hcs-config.properties#amqp.extension.queue.exclusive}
+
+amqp.notification.exchange={file:hcs-config.properties#amqp.notification.exchange}
+amqp.notification.exchange.type={file:hcs-config.properties#amqp.notification.exchange.type}
+amqp.notification.exchange.durable={file:hcs-config.properties#amqp.notification.exchange.durable}
+#if not specified the default value would be <amqp.extension.exchange>-cam.vcd.notifications
+#amqp.notification.queue=
+amqp.notification.queue.durable={file:hcs-config.properties#amqp.notification.exchange.durable}
+amqp.notification.queue.exclusive={file:hcs-config.properties#amqp.notification.queue.exclusive}
+
+# SSL configuration
+amqp.thumbprint={file:hcs-config.properties#amqp.thumbprint}
+
+keystore.pass={file:hcs-config.properties#keystore.pass}
+keystore.keypass={file:hcs-config.properties#keystore.keypass}
+
+# cassandra cluster contact points, node name or IP address, separated by comma
+# not necessary to put all nodes here, two would be fine, if this property is not
+# configured, CAM will get cluster info from cloud VC's look up service as is
+cassandra.cluster.nodes=
+# cassandra cluster nodes port, default port is 9042
+cassandra.cluster.port=9042
+# cassandra keyspace assigned to CAM service
+cassandra.keyspace=cam
+# replication strategy,we will use NetworkTopologyStrategy in production
+# will use SimpleStrategy if this is not configured
+cassandra.replication.class=SimpleStrategy
+# replication factor for SimpleStrategy, an integer number
+cassandra.replication.factor=1
+# replication config for NetworkTopologyStrategy would be in below format
+# 'datacenter1':3, 'datacenter2':4, 'datacenter3':0
+# e.g cassandra.replication.config='dc1':3, 'dc2':4, 'dc3':0
+cassandra.replication.config=
+# set to true when cluster require client to auth in data encryption(by ssl)
+cassandra.client_encryption_auth.required=true
+# set to true when cluster is using PasswordAuthenticator
+# e.g. authenticator: PasswordAuthenticator
+cassandra.password_authentication.enabled=false
+cassandra.password_authentication.username=
+cassandra.password_authentication.password=
+
+# Metering
+meters.version=1.0
+meters.enabled=true
+
+# TODO: remove me when service instance is fixed
+meters.useMockServiceInstance=
+
+# Usage
+meters.usage.exchange.name=vchs.metering.operations.direct
+meters.usage.exchange.type=direct
+meters.usage.exchange.durability=true
+meters.usage.routingkey=metering.l1EmittedUsage
+# Meters Configurations
+meters.config.exchange.name=vchs.metering.operations.direct
+meters.config.exchange.type=direct
+meters.config.exchange.durability=true
+meters.config.routingkey=metering.emitterConfig
+# DR Protected VMs
+meters.usage.drProtectedVMs.enabled=true
+meters.usage.drProtectedVMs.billable=true
+meters.usage.drProtectedVMs.interval=3600000
+# Recovery Plan
+meters.usage.recoveryPlan.enabled=false
+meters.usage.recoveryPlan.billable=false
+meters.usage.recoveryPlan.interval=1800000
+# Recovery Plan Execution
+meters.usage.recoveryPlanExecution.enabled=false
+meters.usage.recoveryPlanExecution.billable=false
+meters.usage.recoveryPlanExecution.interval=60000
+# Vm Operations
+meters.usage.vmOperations.enabled=false
+meters.usage.vmOperations.billable=false
+meters.usage.vmOperations.interval=0
+
+# vCA settings
+vca.region.location=us-california-1-3.vchs.vmware.com
+
+# Service Controller & Service Broker settings
+vca.sc.name=com.vmware.vchs.sc
+vca.sc.version=1.0
+
+sc.exchange=vchs.sc.operations.topic

@@ -172,7 +172,7 @@ public class Main {
 
             ExecutorService executorService = Executors.newFixedThreadPool(maxThroughput);
             for (String hcsServer : hcsServerList) {
-                executorService.submit(new HcsUpgrade(hcsServer, username, password, properties, failedNodeList, latch));
+                executorService.submit(new HcsUpgrade(hcsServer, username, password, properties, failedNodeList, latch, configFileName));
             }
 
             latch.await();
