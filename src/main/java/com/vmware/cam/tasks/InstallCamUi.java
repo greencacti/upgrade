@@ -1,7 +1,6 @@
 package com.vmware.cam.tasks;
 
 import com.vmware.cam.util.ScpRcTo;
-import com.vmware.cam.util.SimpleSleep;
 
 import net.sf.expectit.Expect;
 import static net.sf.expectit.matcher.Matchers.contains;
@@ -34,10 +33,10 @@ public class InstallCamUi {
             expect.expect(times(2, contains("cell-shutdown-success")));
             System.out.println("Shut down VCD cell " + server);
 
-            // restart vmware-vcd
+            // start vmware-vcd
             expect.sendLine("service vmware-vcd start");
             expect.expect(times(2, contains("OK")));
-            System.out.println("Restart vCD cell successfully for " + server);
+            System.out.println("Start vCD cell successfully for " + server);
 
             // Print PID
             expect.sendLine("cat /var/run/vmware-vcd-cell.pid");

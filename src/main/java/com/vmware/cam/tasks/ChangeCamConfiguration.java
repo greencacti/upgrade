@@ -3,6 +3,7 @@ package com.vmware.cam.tasks;
 import com.vmware.cam.util.ScpRcTo;
 import net.sf.expectit.Expect;
 import static net.sf.expectit.matcher.Matchers.contains;
+import static net.sf.expectit.matcher.Matchers.times;
 
 /**
  * Created by yiqunc on 10/13/15.
@@ -10,17 +11,17 @@ import static net.sf.expectit.matcher.Matchers.contains;
 public class ChangeCamConfiguration {
     public static void execute(Expect expect, ScpRcTo scp, String server, String configFileName) {
         try {
-            scp.scpRcTo("UpdateCamConfig.sh", "/root/UpdateCamConfig.sh");
-            scp.scpRcTo("cam-config.properties.template", "/root/cam-config.properties.template");
-            scp.scpTo(configFileName, "/root/upgrade.properties");
-            expect.sendLine("chmod 755 /root/UpdateCamConfig.sh && echo success");
-            expect.expect(contains("success"));
+            scp.scpRcTo("UpdateCamConfig.sh", "/tmp/UpdateCamConfig.sh");
+            scp.scpRcTo("cam-config.properties.template", "/tmp/cam-config.properties.template");
+            scp.scpTo(configFileName, "/tmp/upgrade.properties");
+            expect.sendLine("chmod 755 /tmp/UpdateCamConfig.sh && echo success");
+            expect.expect(times(2, contains("success")));
 
-            expect.sendLine("/root/UpdateCamConfig.sh -f /root/upgrade.properties -t /root/cam-config.properties.template -p cam.config -b /root/");
+            expect.sendLine("/tmp/UpdateCamConfig.sh -f /tmp/upgrade.properties -t /tmp/cam-config.properties.template -p cam.config -b /tmp/");
             expect.expect(contains("success"));
             System.out.println("update new configurations in cam-config.properties.template on " + server);
 
-            expect.sendLine("/root/UpdateCamConfig.sh -f /root/cam-config.properties.template");
+            expect.sendLine("/tmp/UpdateCamConfig.sh -f /tmp/cam-config.properties.template");
             expect.expect(contains("success"));
             System.out.println("update new configurations in cam-config.properties on " + server);
         

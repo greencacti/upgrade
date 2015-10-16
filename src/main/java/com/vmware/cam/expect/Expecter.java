@@ -55,8 +55,7 @@ public class Expecter {
                     .withExceptionOnFailure();
 
             if (isDebugEnabled) {
-                expectBuilder.withEchoOutput(System.out)
-                        .withEchoInput(System.err);
+                expectBuilder.withEchoInput(System.err);
             }
 
             expect = expectBuilder.build();

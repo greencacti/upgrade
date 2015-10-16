@@ -11,8 +11,8 @@ import static net.sf.expectit.matcher.Matchers.contains;
 public class RestartService {
     public static void execute(Expect expect, String server, String service) {
         try {
-            expect.sendLine("service " + service + " restart");
-            SimpleSleep.sleep(10);
+            expect.sendLine("service " + service + " restart && echo success");
+            expect.expect(contains("success"));
 
             expect.sendLine("service " + service + " status");
             expect.expect(contains("running"));

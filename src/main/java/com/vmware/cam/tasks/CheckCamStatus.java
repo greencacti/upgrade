@@ -6,6 +6,7 @@ import net.sf.expectit.Expect;
 import java.io.IOException;
 
 import static net.sf.expectit.matcher.Matchers.contains;
+import static net.sf.expectit.matcher.Matchers.times;
 
 /**
  * Created by baominw on 9/27/15.
@@ -19,7 +20,7 @@ public class CheckCamStatus {
             while (counter > 0) {
                 try {
                     expect.sendLine("grep \"starting...OK\" /opt/vmware/hms/logs/cam.log");
-                    expect.expect(contains("starting...OK"));
+                    expect.expect(contains("com.vmware.cam.CamService"));
                 } catch (IOException e) {
                     counter--;
                     continue;

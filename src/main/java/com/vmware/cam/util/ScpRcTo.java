@@ -36,7 +36,6 @@ public class ScpRcTo {
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
             session.connect();
-            //channel = session.openChannel("exec");
 
             System.out.println("Login to " + server + " for scp successfully");
 
@@ -56,7 +55,6 @@ public class ScpRcTo {
 
     public void stop() {
         try {
-            //channel.disconnect();
             session.disconnect();
         } catch (Exception e) {
         }
@@ -113,7 +111,7 @@ public class ScpRcTo {
 
             // send a content of srcFile
             fis = new FileInputStream(srcFile);
-            byte[] buf = new byte[1024*1024];
+            byte[] buf = new byte[1024 * 1024];
             while (true) {
                 int len = fis.read(buf, 0, buf.length);
                 if (len <= 0)
@@ -147,10 +145,10 @@ public class ScpRcTo {
             throw new RuntimeException(e);
         }
     }
-    
+
     public void scpRcTo(String srcFile, String destFile) {
         URL resource = getClass().getClassLoader().getResource(srcFile);
-        
+
         InputStream fis = getClass().getClassLoader().getResourceAsStream(srcFile);
 
         try {
@@ -172,7 +170,8 @@ public class ScpRcTo {
                         + " on server " + server);
             }
 
-            File _srcFile = Paths.get(resource.toURI()).toFile();;
+            File _srcFile = Paths.get(resource.toURI()).toFile();
+            ;
 
             // send "C0644 filesize filename", where filename should not include
             // '/'
@@ -193,7 +192,7 @@ public class ScpRcTo {
             }
 
             // send a content of srcFile
-            byte[] buf = new byte[1024*1024];
+            byte[] buf = new byte[1024 * 1024];
             while (true) {
                 int len = fis.read(buf, 0, buf.length);
                 if (len <= 0)
@@ -231,7 +230,7 @@ public class ScpRcTo {
 
     // This logic is copied from
     // http://www.jcraft.com/jsch/examples/ScpTo.java.html
-    static int checkAck(InputStream in) throws IOException {
+    private int checkAck(InputStream in) throws IOException {
         int b = in.read();
         // b may be 0 for success,
         // 1 for error,
@@ -257,14 +256,5 @@ public class ScpRcTo {
             }
         }
         return b;
-    }
-
-    public static void main(String[] args) {
-        ScpRcTo scp = new ScpRcTo("10.110.173.97", "root", "vmware11");
-        scp.start();
-        scp.scpRcTo("UpdateCamConfig.sh", "/root/UpdateCamConfig.sh");
-        scp.scpRcTo("cam-config.properties.template", "/root/cam-config.properties.template");
-        scp.scpTo("/Users/yiqunc/Workspaces/cam/cam_deploy/upgrade/src/main/resources/upgrade.properties", "/root/upgrade.properties");
-        scp.stop();
     }
 }
