@@ -50,7 +50,7 @@ public class Expecter {
             ExpectBuilder expectBuilder = new ExpectBuilder()
                     .withOutput(channel.getOutputStream())
                     .withInputs(channel.getInputStream(), channel.getExtInputStream())
-                    .withTimeout(60, TimeUnit.SECONDS)
+                    .withTimeout(300, TimeUnit.SECONDS)
                     .withInputFilters(removeColors())
                     .withExceptionOnFailure();
 

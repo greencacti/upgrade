@@ -38,7 +38,7 @@ public class ScpRcTo {
             session.connect();
             //channel = session.openChannel("exec");
 
-            System.out.println("Login to " + server + " successfully");
+            System.out.println("Login to " + server + " for scp successfully");
 
         } catch (JSchException jschException) {
             if (jschException.getCause() instanceof SocketException) {
@@ -113,7 +113,7 @@ public class ScpRcTo {
 
             // send a content of srcFile
             fis = new FileInputStream(srcFile);
-            byte[] buf = new byte[1024];
+            byte[] buf = new byte[1024*1024];
             while (true) {
                 int len = fis.read(buf, 0, buf.length);
                 if (len <= 0)
@@ -193,7 +193,7 @@ public class ScpRcTo {
             }
 
             // send a content of srcFile
-            byte[] buf = new byte[1024];
+            byte[] buf = new byte[1024*1024];
             while (true) {
                 int len = fis.read(buf, 0, buf.length);
                 if (len <= 0)

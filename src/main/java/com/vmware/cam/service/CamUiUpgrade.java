@@ -3,6 +3,8 @@ package com.vmware.cam.service;
 import com.vmware.cam.expect.Expecter;
 import com.vmware.cam.tasks.InstallCamUi;
 import com.vmware.cam.util.FailedNodeList;
+import com.vmware.cam.util.ScpRcTo;
+
 import net.sf.expectit.Expect;
 
 import java.util.Properties;
@@ -17,6 +19,9 @@ public class CamUiUpgrade implements Runnable {
     private final String vcdcell;
     private final Properties properties;
     private final FailedNodeList failedNodeList;
+    private final ScpRcTo scp;
+    private final String username;
+    private final String password;
 
     public CamUiUpgrade(String vcdcell, String username, String password, Properties properties, FailedNodeList failedNodeList, CountDownLatch latch) {
         this.expecter = new Expecter(vcdcell, username, password);
@@ -24,6 +29,9 @@ public class CamUiUpgrade implements Runnable {
         this.properties = properties;
         this.latch = latch;
         this.failedNodeList = failedNodeList;
+        this.scp = new ScpRcTo(vcdcell, username, password);
+        this.username = username;
+        this.password = password;
     }
 
     @Override
@@ -45,8 +53,18 @@ public class CamUiUpgrade implements Runnable {
                 System.out.println("missing camUiUrl in upgrade.properties");
                 throw new RuntimeException();
             }
-            InstallCamUi.execute(expect, vcdcell, camUiUrl);
+            
+            // remote location for UI package on vcd cell
+            String remoteCamUiUrl = properties.getProperty("remoteCamUiUrl");
+            if (remoteCamUiUrl == null) {
+                System.out.println("missing remoteCamUiUrl in upgrade.properties");
+                throw new RuntimeException();
+            }
 
+            scp.start();
+            InstallCamUi.execute(expect, scp, vcdcell, camUiUrl, remoteCamUiUrl, username, password);
+
+            scp.stop();
             expecter.stop();
             latch.countDown();
         } catch (Throwable e) {

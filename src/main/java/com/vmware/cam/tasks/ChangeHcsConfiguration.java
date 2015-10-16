@@ -1,10 +1,11 @@
 package com.vmware.cam.tasks;
 
 import com.vmware.cam.util.SimpleSleep;
-import net.sf.expectit.Expect;
 
+import net.sf.expectit.Expect;
 import static net.sf.expectit.matcher.Matchers.anyString;
 import static net.sf.expectit.matcher.Matchers.contains;
+import static net.sf.expectit.matcher.Matchers.times;
 
 /**
  * Created by baominw on 9/26/15.
@@ -41,17 +42,14 @@ public class ChangeHcsConfiguration {
                     "\n" +
                     "service.routing.key=hcs\n" +
                     "\n" +
-                    "vc-gateway-expiration-minutes=5'  >> /opt/vmware/hms/conf/hcs-config.properties.rpmsave && echo 'success'");
-            SimpleSleep.sleep(1);
-            expect.expect(contains("success"));
+                    "vc-gateway-expiration-minutes=5'  >> /opt/vmware/hms/conf/hcs-config.properties.rpmsave && echo update-rpmsave-success");
+            expect.expect(times(2, contains("update-rpmsave-success")));
 
-            expect.sendLine("mv /opt/vmware/hms/conf/hcs-config.properties /opt/vmware/hms/conf/hcs-config.properties.new && echo 'success'");
-            SimpleSleep.sleep(1);
-            expect.expect(contains("success"));
-
-            expect.sendLine("mv /opt/vmware/hms/conf/hcs-config.properties.rpmsave /opt/vmware/hms/conf/hcs-config.properties && echo 'success'");
-            SimpleSleep.sleep(1);
-            expect.expect(contains("success"));
+            expect.sendLine("mv /opt/vmware/hms/conf/hcs-config.properties /opt/vmware/hms/conf/hcs-config.properties.new && echo rename-config-success");
+            expect.expect(times(2, contains("rename-config-success")));
+            
+            expect.sendLine("mv /opt/vmware/hms/conf/hcs-config.properties.rpmsave /opt/vmware/hms/conf/hcs-config.properties && echo update-config-success");
+            expect.expect(times(2, contains("update-config-success")));
             System.out.println("append new configurations into hcs-config.properties in " + server);
         } catch (Throwable e) {
             e.printStackTrace();

@@ -13,9 +13,8 @@ public class RemoveFileOrDir {
     public static void execute(Expect expect, String server, String filePath) {
         try {
             // install CAM UI
-            expect.sendLine("rm -rf " + filePath + " && echo 'success'");
-            SimpleSleep.sleep(1);
-            expect.expect(contains("success"));
+            expect.sendLine("rm -rf " + filePath + " && echo remove-file-success");
+            expect.expect(times(2, contains("remove-file-success")));
             System.out.println("remove " + filePath + " in " + server);
         } catch (Throwable e) {
             e.printStackTrace();
