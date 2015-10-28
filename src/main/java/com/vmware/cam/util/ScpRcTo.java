@@ -4,8 +4,6 @@ import com.jcraft.jsch.*;
 
 import java.io.*;
 import java.net.SocketException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -147,11 +145,18 @@ public class ScpRcTo {
     }
 
     public void scpRcTo(String srcFile, String destFile) {
-        URL resource = getClass().getClassLoader().getResource(srcFile);
 
-        InputStream fis = getClass().getClassLoader().getResourceAsStream(srcFile);
+        InputStream fis = null;
 
         try {
+
+            fis = getClass().getClassLoader().getResourceAsStream(srcFile);
+
+            // Temporary workaround to fetch the size of resource file
+            long filesize = getInputStreamSize(fis);
+            fis.close();
+
+            fis = getClass().getClassLoader().getResourceAsStream(srcFile);
 
             // exec 'scp -t destFile' remotely
             String command = "scp -t " + destFile;
@@ -170,12 +175,8 @@ public class ScpRcTo {
                         + " on server " + server);
             }
 
-            File _srcFile = Paths.get(resource.toURI()).toFile();
-            ;
-
             // send "C0644 filesize filename", where filename should not include
             // '/'
-            long filesize = _srcFile.length();
             command = "C0644 " + filesize + " ";
             if (srcFile.lastIndexOf('/') > 0) {
                 command += srcFile.substring(srcFile.lastIndexOf('/') + 1);
@@ -225,6 +226,35 @@ public class ScpRcTo {
             } catch (Exception ee) {
             }
             throw new RuntimeException(e);
+        }
+    }
+
+    // A workaround to read InputStream and write to
+    // ByteArrayOutputStream in order to calculate the size
+    // of an InputStream.
+    // The InputStream is then consumed and need reset or reopen
+    // Suggest not to perform on large files
+    private long getInputStreamSize(InputStream is){
+
+        if (is == null){
+            throw new RuntimeException("Failed to get resource file size. InputStream is null");
+        }
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        byte[] buf = new byte[1024 * 1024];
+        try{
+	        while (true) {
+	            int len = is.read(buf, 0, buf.length);
+	            if (len <= 0)
+	                break;
+	            os.write(buf, 0, len);
+	            os.flush();
+	        }
+	        long fileSize = os.toByteArray().length;
+	        os.close();
+	        return fileSize;
+        }catch(Exception e){
+            throw new RuntimeException("Failed to get resource file size.");
         }
     }
 
