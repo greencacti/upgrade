@@ -1,9 +1,6 @@
 package com.vmware.cam;
 
-import com.vmware.cam.service.CamUiUpgrade;
-import com.vmware.cam.service.HbrUpgrade;
-import com.vmware.cam.service.HcsUpgrade;
-import com.vmware.cam.service.HmsUpgrade;
+import com.vmware.cam.service.*;
 import com.vmware.cam.util.FailedNodeList;
 
 import java.io.*;
@@ -22,7 +19,8 @@ public class Main {
         HBR,
         HMS,
         CAMUI,
-        HCS
+        HCS,
+        CAM
     }
 
     private static final String COMMENT_PREFIX = "#";
@@ -43,7 +41,9 @@ public class Main {
             component = Component.CAMUI;
         } else if (args[0].equals("hcs")) {
             component = Component.HCS;
-        }else {
+        } else if (args[0].equals("cam")) {
+            component = Component.CAM;
+        } else {
             System.out.println("component name is not correct");
             usage();
             return;
@@ -54,6 +54,7 @@ public class Main {
         String hmsListFileName = "";
         String vcdcellListFileName = "";
         String hcsListFileName = "";
+        String camListFileName = "";
         String failedListFileName = "";
         String username = "";
         String password = "";
@@ -69,7 +70,9 @@ public class Main {
                 vcdcellListFileName = arg.substring("--vcdcelllist=".length());
             } else if (arg.startsWith("--hcslist=")) {
                 hcsListFileName = arg.substring("--hcslist=".length());
-            }else if (arg.startsWith("--user=")) {
+            } else if (arg.startsWith("--camlist=")) {
+                camListFileName = arg.substring("--camlist=".length());
+            } else if (arg.startsWith("--user=")) {
                 username = arg.substring("--user=".length());
             } else if (arg.startsWith("--password=")) {
                 password = arg.substring("--password=".length());
@@ -177,6 +180,28 @@ public class Main {
 
             latch.await();
             executorService.shutdown();
+        } else if (component == Component.CAM) {
+            if (camListFileName.equals("")) {
+                usage();
+                return;
+            }
+
+            String[] camServerList = readListFile(camListFileName);
+            int maxThroughput = camServerList.length;
+            if (maxThroughput == 0) {
+                System.out.println("cam.list is empty");
+                return;
+            }
+
+            CountDownLatch latch = new CountDownLatch(maxThroughput);
+
+            ExecutorService executorService = Executors.newFixedThreadPool(maxThroughput);
+            for (String camServer : camServerList) {
+                executorService.submit(new CamUpgrade(camServer, username, password, properties, failedNodeList, latch, configFileName));
+            }
+
+            latch.await();
+            executorService.shutdown();
         } else if (component == Component.CAMUI) {
             if (vcdcellListFileName.equals("")) {
                 usage();
@@ -207,7 +232,7 @@ public class Main {
     }
 
     private static void usage() {
-        System.out.println("Usage: upgrade [hbr|hms|camui] --config=configfile [--hbrlist=hbr.list|--hmslist=hms.list|--vcdcelllist=vcdcell.list] --failedList=failed.list --user=username --password=password");
+        System.out.println("Usage: upgrade [hbr|hms|camui|hcs|cam] --config=configfile [--hbrlist=hbr.list|--hmslist=hms.list|--vcdcelllist=vcdcell.list|--hcslist=hcs.list|--camlist=cam.list] --failedList=failed.list --user=username --password=password");
     }
 
     private static String[] readListFile(String fileName) {
