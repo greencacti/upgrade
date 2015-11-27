@@ -18,8 +18,8 @@ public class ChangeProviderRuntime {
                     "    <property name=\"localRepositoryPasswordFormat\" value=\"base64\" />\n" +
                     "  </properties>\n" +
                     "</service>'" +
-                    "> /opt/vmware/var/lib/vami/update/provider/provider-runtime.xml && echo success");
-            expect.expect(times(2, contains("success")));
+                    "> /opt/vmware/var/lib/vami/update/provider/provider-runtime.xml && echo success$((5400+25))");
+            expect.expect(contains("success5425"));
             System.out.println("update provider-runtime.xml successfully for " + server);
         } catch (Throwable e) {
             e.printStackTrace();

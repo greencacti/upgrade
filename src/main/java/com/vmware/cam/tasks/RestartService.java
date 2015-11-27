@@ -1,6 +1,5 @@
 package com.vmware.cam.tasks;
 
-import com.vmware.cam.util.SimpleSleep;
 import net.sf.expectit.Expect;
 
 import static net.sf.expectit.matcher.Matchers.contains;
@@ -11,8 +10,8 @@ import static net.sf.expectit.matcher.Matchers.contains;
 public class RestartService {
     public static void execute(Expect expect, String server, String service) {
         try {
-            expect.sendLine("service " + service + " restart && echo success");
-            expect.expect(contains("success"));
+            expect.sendLine("service " + service + " restart && echo success$((5400+25))");
+            expect.expect(contains("success5425"));
 
             expect.sendLine("service " + service + " status");
             expect.expect(contains("running"));
