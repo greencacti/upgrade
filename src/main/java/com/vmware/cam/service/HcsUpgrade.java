@@ -76,6 +76,9 @@ public class HcsUpgrade implements Runnable {
             // change HCS Configuration
             ChangeHcsConfiguration.execute(expect, hcsServer);
             
+            // activitate CAM Service
+            ActivitateService.execute(expect, hcsServer, "hcs");
+
             // reboot HCS appliance
             RebootAppliance.execute(expect, hcsServer);
             expecter.stop();
@@ -84,23 +87,6 @@ public class HcsUpgrade implements Runnable {
             // reconnect to hcs server
             ReconnectToServer.execute(expecter, hcsServer, isDebugEnabled);
             expect = expecter.getExpect();
-
-            // change CAM configuration
-            scp.start();
-            ChangeCamConfiguration.execute(expect, scp, hcsServer, configFileName);
-            scp.stop();
-
-            // Remove cam.log
-            RemoveFileOrDir.execute(expect, hcsServer, "/opt/vmware/hms/logs/cam.log");
-
-            // activitate CAM Service
-            ActivitateService.execute(expect, hcsServer, "cam");
-
-            // restart CAM Service
-            RestartService.execute(expect, hcsServer, "cam");
-
-            // check CAM Service
-            CheckCamStatus.execute(expect, hcsServer);
 
             expecter.stop();
             latch.countDown();

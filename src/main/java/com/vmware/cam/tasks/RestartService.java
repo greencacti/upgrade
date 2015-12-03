@@ -1,7 +1,8 @@
 package com.vmware.cam.tasks;
 
-import net.sf.expectit.Expect;
+import com.vmware.cam.util.SimpleSleep;
 
+import net.sf.expectit.Expect;
 import static net.sf.expectit.matcher.Matchers.contains;
 
 /**
@@ -13,6 +14,7 @@ public class RestartService {
             expect.sendLine("service " + service + " restart && echo success$((5400+25))");
             expect.expect(contains("success5425"));
 
+            SimpleSleep.sleep(10);
             expect.sendLine("service " + service + " status");
             expect.expect(contains("running"));
             System.out.println(service + " service is started in " + server);

@@ -76,8 +76,9 @@ public class HbrUpgrade implements Runnable {
             ReconnectToServer.execute(expecter, hbrServer, isDebugEnabled);
             expect = expecter.getExpect();
 
-            // enable 2144(TCP Port) in FW
+            // enable 2144 and 9998 (TCP Port) in FW
             EnableTcpPortInFW.execute(expect, hbrServer, "2144");
+            EnableTcpPortInFW.execute(expect, hbrServer, "9998");
 
             // reload firewall configuration
             ReloadFW.execute(expect, hbrServer);
