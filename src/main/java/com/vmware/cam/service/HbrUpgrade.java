@@ -83,9 +83,6 @@ public class HbrUpgrade implements Runnable {
             // reload firewall configuration
             ReloadFW.execute(expect, hbrServer);
 
-            // restart HBR Service
-            RestartService.execute(expect, hbrServer, "hbrsrv");
-
             expecter.stop();
             latch.countDown();
         } catch (Throwable e) {
